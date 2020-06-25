@@ -12,6 +12,7 @@
     <Authors>romkij</Authors>
     <Company>Rybalko Software</Company>
     <Product></Product>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
