@@ -1,4 +1,7 @@
-﻿namespace RSoftware.Unity.PublisherApi.Client
+﻿using RSoftware.Unity.PublisherApi.Client.Models.Accounts;
+using RSoftware.Unity.PublisherApi.Client.Models.User;
+
+namespace RSoftware.Unity.PublisherApi.Client
 {
     using Newtonsoft.Json;
     using RSoftware.Unity.PublisherApi.Client.Exceptions;
@@ -10,7 +13,6 @@
     using RSoftware.Unity.PublisherApi.Client.Models.Publisher;
     using RSoftware.Unity.PublisherApi.Client.Models.Revenues;
     using RSoftware.Unity.PublisherApi.Client.Models.Sales;
-    using RSoftware.Unity.PublisherApi.Client.Models.User;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -261,7 +263,7 @@
         {
             return await GetSalesAsync(period.Value);
         }
-        
+
         /// <summary>
         /// Get sales for requested period.
         /// </summary>
@@ -285,6 +287,21 @@
             }
 
             return new SalesPeriodInfo(packages, Utility.ParseFloat(publisherInfo.PayoutCut));
+        }
+
+        /// <summary>
+        /// Get user accounts for publisher.
+        /// </summary>
+        /// <returns>All accounts for publisher.</returns>
+        public async Task<Account[]> GetUserAccountsAsync()
+        {
+            AssertIsLoggedIn();
+
+            var publisherInfo = await GetPublisherInfoAsync();
+
+            var response = await FetchDataAsync<AccountsResponse>($"/api/publisher-info/users/{publisherInfo.Id}.json");
+
+            return response.Payload.Select(data => new Account(data)).ToArray();
         }
 
         private async Task<TDataType> FetchDataAsync<TDataType>(string url)
