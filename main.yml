@@ -1,0 +1,18 @@
+name: build
+on:
+  push:
+    branches:
+      - master # Default release branch
+jobs:
+  publish:
+    name: list on nuget
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Publish
+      - name: publish RSoftware.Unity.PublisherApi.Client.dll
+        uses: brandedoutcast/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: RSoftware.Unity.PublisherApi.Client/RSoftware.Unity.PublisherApi.Client.csproj
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
