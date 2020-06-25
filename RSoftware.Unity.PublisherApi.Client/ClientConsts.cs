@@ -15,8 +15,6 @@
         public const string SESSION_COOKIE_NAME = "kharma_session";
         public const string GENESIS_COOKIE_NAME = "_genesis_auth_frontend_session";
      
-        public const string TFA_CODE_REQUESTED = "TFA_CODE_REQUESTED";
-
         public const string PERIOD_DT_FORMAT = "yyyyMM";
     }
 }

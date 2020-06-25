@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageProjectUrl>https://github.com/RybalkoSoftware</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/RybalkoSoftware/RSoftware.Unity.PublisherApi.Client</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>api unity gamedev publisher assets integration</PackageTags>
+    <Copyright>Copyright © rybalko.software</Copyright>
+    <Description>API Client for Unity Publisher Portal - publisher.assetstore.unity3d.com</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Authors>romkij</Authors>
+    <Company>Rybalko Software</Company>
+    <Product></Product>
   </PropertyGroup>
 
   <ItemGroup>

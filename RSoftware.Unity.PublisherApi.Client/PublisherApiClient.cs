@@ -28,6 +28,9 @@
 
         private HttpClient _httpClient;
 
+        /// <summary>
+        /// Client state.
+        /// </summary>
         public bool IsLoggedIn { get; private set; }
 
         public PublisherApiClient()
@@ -35,6 +38,10 @@
             _cookieContainer = new CookieContainer();
         }
 
+        /// <summary>
+        /// Login to publisher portal with previously obtained token.
+        /// </summary>
+        /// <param name="token">Previously saved token in format KharmaToken.KharmaSession</param>
         public void LoginWithTokenAsync(string token)
         {
             if (IsLoggedIn)
@@ -46,6 +53,14 @@
             _accessToken = token;
         }
 
+        /// <summary>
+        /// Login to Unity Publisher Portal.
+        /// </summary>
+        /// <param name="username">Email or username</param>
+        /// <param name="password">Password</param>
+        /// <param name="tfaResumeData">Two-factor auth data previously obtained</param>
+        /// <param name="tfaCode">Two-factor auth code</param>
+        /// <returns>Returns LoginResult with current status of login and Two-factor data if Unity Publisher Portal need this.</returns>
         public async Task<LoginResult> LoginAsync(string username, string password, TwoFactorAuthData tfaResumeData = null, string tfaCode = null)
         {
             if (IsLoggedIn)
@@ -53,7 +68,7 @@
                 return new LoginResult()
                 {
                     AccessToken = _accessToken,
-                    Status = LoginStatus.Success
+                    Status = LoginStatus.Success,
                 };
             }
 
@@ -67,11 +82,20 @@
             return result;
         }
 
+        /// <summary>
+        /// Login to Unity Publisher Portal with TFA data specified.
+        /// </summary>
+        /// <param name="tfaResumeData">Two-factor auth data previously obtained</param>
+        /// <param name="tfaCode">Two-factor auth code</param>
+        /// <returns>Returns LoginResult with current status of login.</returns>
         public async Task<LoginResult> LoginAsync(TwoFactorAuthData tfaResumeData, string tfaCode)
         {
             return await LoginAsync(null, null, tfaResumeData, tfaCode);
         }
 
+        /// <summary>
+        /// Logout from Unity Publisher Portal and disposing access token.
+        /// </summary>
         public async Task LogoutAsync()
         {
             if (!IsLoggedIn)
@@ -85,7 +109,7 @@
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new UnityPublisherApiException($"Logout request failed, error code {response.StatusCode}");
+                throw new UnityPublisherApiException($"Logout request failed, error code {response.StatusCode}", response.StatusCode);
             }
 
             _accessToken = null;
@@ -93,11 +117,19 @@
             _cookieContainer = new CookieContainer();
         }
 
+        /// <summary>
+        /// Get account information.
+        /// </summary>
+        /// <returns>Information about user.</returns>
         public async Task<UserInfo> GetUserInfoAsync()
         {
             return await FetchDataAsync<UserInfo>("/api/user/overview.json"); ;
         }
 
+        /// <summary>
+        /// Get publisher information.
+        /// </summary>
+        /// <returns>Information about publisher</returns>
         public async Task<PublisherInfo> GetPublisherInfoAsync()
         {
             AssertIsLoggedIn();
@@ -107,6 +139,11 @@
             return data.Overview;
         }
 
+        /// <summary>
+        /// Get verified invoices by id.
+        /// </summary>
+        /// <param name="invoices">Invoices ids</param>
+        /// <returns>Information about requested invoices.</returns>
         public async Task<Invoice[]> VerifyInvoicesAsync(string[] invoices)
         {
             AssertIsLoggedIn();
@@ -120,6 +157,12 @@
             return data.Payload.Select(payload => new Invoice(payload)).ToArray();
         }
 
+        /// <summary>
+        /// Get verified invoices by id. Don't require login to publisher portal.
+        /// </summary>
+        /// <param name="apiKey">API key from publisher portal</param>
+        /// <param name="invoices">Invoices ids</param>
+        /// <returns>Information about requested invoices.</returns>
         public async Task<Models.Api.Invoice[]> VerifyInvoicesByApiKeyAsync(string apiKey, string[] invoices)
         {
             var invoice = string.Join(",", invoices);
@@ -138,6 +181,10 @@
             return response.Invoices;
         }
 
+        /// <summary>
+        /// Get revenue information.
+        /// </summary>
+        /// <returns>Information about revenue.</returns>
         public async Task<Revenue[]> GetRevenueAsync()
         {
             AssertIsLoggedIn();
@@ -149,6 +196,10 @@
             return response.Payload.Select(data => new Revenue(data)).ToArray();
         }
 
+        /// <summary>
+        /// Get packages information presented in portal.
+        /// </summary>
+        /// <returns>Packages information and it's statuses.</returns>
         public async Task<PackagesInfo> GetPackagesInfoAsync()
         {
             AssertIsLoggedIn();
@@ -156,6 +207,12 @@
             return await FetchDataAsync<PackagesInfo>("/api/management/packages.json");
         }
 
+        /// <summary>
+        /// Get downloads information about packages for selected period.
+        /// </summary>
+        /// <param name="period">Requested period - year, month</param>
+        /// <param name="filter">Specify packages type</param>
+        /// <returns>Information about package downloads.</returns>
         public async Task<PackageDownloads[]> GetDownloadsAsync(DateTimeOffset period, PackageFilter filter = PackageFilter.All)
         {
             AssertIsLoggedIn();
@@ -180,6 +237,10 @@
             return downloads;
         }
 
+        /// <summary>
+        /// Get available sales periods.
+        /// </summary>
+        /// <returns>Sales periods.</returns>
         public async Task<SalesPeriod[]> GetSalesPeriodsAsync()
         {
             AssertIsLoggedIn();
@@ -191,11 +252,21 @@
             return response.Periods;
         }
 
+        /// <summary>
+        /// Get sales for requested period.
+        /// </summary>
+        /// <param name="period">Period - year, month</param>
+        /// <returns>Sales in period.</returns>
         public async Task<SalesPeriodInfo> GetSalesAsync(SalesPeriod period)
         {
             return await GetSalesAsync(period.Value);
         }
-
+        
+        /// <summary>
+        /// Get sales for requested period.
+        /// </summary>
+        /// <param name="period">Period - year, month</param>
+        /// <returns>Sales in period.</returns>
         public async Task<SalesPeriodInfo> GetSalesAsync(DateTimeOffset period)
         {
             AssertIsLoggedIn();
@@ -230,7 +301,7 @@
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new UnityPublisherApiException($"Fetching data from \"{url}\" failed, error code {response.StatusCode}");
+                throw new UnityPublisherApiException($"Fetching data from \"{url}\" failed, error code {response.StatusCode}", response.StatusCode);
             }
 
             return await response.Content.ReadAsStringAsync();
@@ -249,7 +320,7 @@
                     var response = await httpClient.GetAsync(ClientConsts.SALES_URL);
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new UnityPublisherApiException($"Login failed, error code {response.StatusCode}");
+                        throw new UnityPublisherApiException($"Login failed, error code {response.StatusCode}", response.StatusCode);
                     }
 
                     var redirectUrl = response.RequestMessage.RequestUri;
@@ -257,7 +328,7 @@
 
                     if (string.IsNullOrWhiteSpace(genesisToken))
                     {
-                        throw new UnityPublisherApiException($"{ClientConsts.GENESIS_COOKIE_NAME} cookie not found");
+                        throw new UnityPublisherApiException($"{ClientConsts.GENESIS_COOKIE_NAME} cookie not found", response.StatusCode);
                     }
 
                     pageData = await response.Content.ReadAsStringAsync();
@@ -284,7 +355,7 @@
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new UnityPublisherApiException($"Conversation failed, error code {response.StatusCode}");
+                        throw new UnityPublisherApiException($"Conversation failed, error code {response.StatusCode}", response.StatusCode);
                     }
 
                     pageData = await response.Content.ReadAsStringAsync();
@@ -318,12 +389,11 @@
                         {"authenticity_token", tfaResumeData.AuthenticityToken},
                         {"conversations_tfa_required_form[verify_code]", tfaCode},
                         {"conversations_tfa_required_form[submit_verify_code]", "Verify"},
-                        //{"commit", "Verify"},
                     }));
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new UnityPublisherApiException($"TFA conversation failed, error code {response.StatusCode}");
+                        throw new UnityPublisherApiException($"TFA conversation failed, error code {response.StatusCode}", response.StatusCode);
                     }
 
                     pageData = await response.Content.ReadAsStringAsync();
@@ -337,24 +407,10 @@
 
                 if (!bounceResponse.IsSuccessStatusCode || string.IsNullOrWhiteSpace(bounceUrl))
                 {
-                    throw new UnityPublisherApiException($"Bounce failed, error code {bounceResponse.StatusCode}");
+                    throw new UnityPublisherApiException($"Bounce failed, error code {bounceResponse.StatusCode}", bounceResponse.StatusCode);
                 }
 
                 var bounceUri = new Uri(bounceUrl);
-
-                //pageData = await response.Content.ReadAsStringAsync();
-
-                //bounceMatches = bounceRegex.Matches(pageData);
-                //bounceUrl = bounceMatches.Count > 0 ? bounceMatches[0].Groups[1].Value : null;
-
-                //response = await httpClient.GetAsync(bounceUrl);
-
-                //if (!response.IsSuccessStatusCode || string.IsNullOrWhiteSpace(bounceUrl))
-                //{
-                //    throw new UnityPublisherApiException($"Bounce failed, error code {response.StatusCode}");
-                //}
-
-                //pageData = await response.Content.ReadAsStringAsync();
 
                 var kharmaToken = GetCookie(cookieContainer, bounceUri, ClientConsts.TOKEN_COOKIE_NAME);
 
@@ -391,14 +447,6 @@
                 }
 
                 _httpClient = CreateHttpClient(new Uri(ClientConsts.BASE_ADDRESS), _cookieContainer);
-                //    new HttpClient(handler)
-                //{
-                //    BaseAddress = new Uri(ClientConsts.BASE_ADDRESS),
-                //    DefaultRequestHeaders =
-                //    {
-                //        { "User-Agent", ClientConsts.USER_AGENT }
-                //    },
-                //};
             }
 
             return _httpClient;
