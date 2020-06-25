@@ -34,7 +34,7 @@ namespace RSoftware.Unity.PublisherApi.Client.Misc
 
         public static DateTimeOffset ParseDt(string value, string format = DATE_FORMAT)
         {
-            return DateTimeOffset.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var result) ? result : DateTimeOffset.MinValue;
+            return DateTimeOffset.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var result) ? result : default;
         }
     }
 }

@@ -1,13 +1,9 @@
 ﻿
-
 namespace RSoftware.Unity.PublisherApi.Client.Models.Accounts
 {
-    using Newtonsoft.Json;
+    using RSoftware.Unity.PublisherApi.Client.Models.Internal;
 
-    internal class AccountsResponse
+    internal class AccountsResponse : DataResponse
     {
-
-        [JsonProperty("aaData")]
-        public string[][] Payload { get; set; }
     }
 }

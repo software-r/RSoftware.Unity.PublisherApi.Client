@@ -1,11 +1,9 @@
 ﻿
+using RSoftware.Unity.PublisherApi.Client.Models.Internal;
+
 namespace RSoftware.Unity.PublisherApi.Client.Models.Revenues
 {
-    using Newtonsoft.Json;
-
-    internal partial class RevenueResponse
+    internal class RevenueResponse : DataResponse
     {
-        [JsonProperty("aaData")]
-        public string[][] Payload { get; set; }
     }
 }

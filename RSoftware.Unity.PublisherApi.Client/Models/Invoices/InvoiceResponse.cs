@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-
-namespace RSoftware.Unity.PublisherApi.Client.Models.Invoices
+﻿namespace RSoftware.Unity.PublisherApi.Client.Models.Invoices
 {
-    public class InvoiceResponse
+    using RSoftware.Unity.PublisherApi.Client.Models.Internal;
+
+    internal class InvoiceResponse : DataResponse
     {
-        [JsonProperty("aaData")]
-        public string[][] Payload { get; set; }
     }
 }

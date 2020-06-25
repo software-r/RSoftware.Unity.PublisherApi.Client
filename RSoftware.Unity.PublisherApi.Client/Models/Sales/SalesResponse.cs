@@ -1,13 +1,12 @@
 ﻿
+
 namespace RSoftware.Unity.PublisherApi.Client.Models.Sales
 {
     using Newtonsoft.Json;
+    using RSoftware.Unity.PublisherApi.Client.Models.Internal;
 
-    internal partial class SalesResponse
+    internal class SalesResponse : DataResponse
     {
-        [JsonProperty("aaData")]
-        public string[][] Payload { get; set; }
-
         [JsonProperty("result")]
         public SalesPackageIncome[] PackageIncomes { get; set; }
     }

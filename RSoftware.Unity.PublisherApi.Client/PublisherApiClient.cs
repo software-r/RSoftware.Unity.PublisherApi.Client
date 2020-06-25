@@ -1,11 +1,10 @@
-﻿using RSoftware.Unity.PublisherApi.Client.Models.Accounts;
-using RSoftware.Unity.PublisherApi.Client.Models.User;
-
+﻿
 namespace RSoftware.Unity.PublisherApi.Client
 {
     using Newtonsoft.Json;
     using RSoftware.Unity.PublisherApi.Client.Exceptions;
     using RSoftware.Unity.PublisherApi.Client.Misc;
+    using RSoftware.Unity.PublisherApi.Client.Models.Accounts;
     using RSoftware.Unity.PublisherApi.Client.Models.Downloads;
     using RSoftware.Unity.PublisherApi.Client.Models.Invoices;
     using RSoftware.Unity.PublisherApi.Client.Models.Login;
@@ -13,6 +12,8 @@ namespace RSoftware.Unity.PublisherApi.Client
     using RSoftware.Unity.PublisherApi.Client.Models.Publisher;
     using RSoftware.Unity.PublisherApi.Client.Models.Revenues;
     using RSoftware.Unity.PublisherApi.Client.Models.Sales;
+    using RSoftware.Unity.PublisherApi.Client.Models.User;
+    using RSoftware.Unity.PublisherApi.Client.Models.Vouchers;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -302,6 +303,19 @@ namespace RSoftware.Unity.PublisherApi.Client
             var response = await FetchDataAsync<AccountsResponse>($"/api/publisher-info/users/{publisherInfo.Id}.json");
 
             return response.Payload.Select(data => new Account(data)).ToArray();
+        }
+
+        /// <summary>
+        /// Get issued vouchers.
+        /// </summary>
+        /// <returns>Issued vouchers.</returns>
+        public async Task<Voucher[]> GetVouchersAsync()
+        {
+            AssertIsLoggedIn();
+
+            var publisherInfo = await GetPublisherInfoAsync();
+            var response = await FetchDataAsync<VouchersResponse>($"/api/publisher-info/vouchers/{publisherInfo.Id}.json");
+            return response.Payload.Select(data => new Voucher(data)).ToArray();
         }
 
         private async Task<TDataType> FetchDataAsync<TDataType>(string url)

@@ -2,11 +2,9 @@
 
 namespace RSoftware.Unity.PublisherApi.Client.Models.Downloads
 {
-    public partial class DownloadsResponse
+    using RSoftware.Unity.PublisherApi.Client.Models.Internal;
+    internal class DownloadsResponse : DataResponse
     {
-        [JsonProperty("aaData")]
-        public string[][] Payload { get; set; }
-
         [JsonProperty("result")]
         public PackageLink[] Links { get; set; }
     }

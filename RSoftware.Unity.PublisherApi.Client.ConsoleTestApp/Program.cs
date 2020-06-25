@@ -18,14 +18,14 @@ namespace RSoftware.Unity.PublisherApi.Client.ConsoleTestApp
         {
             var client = new PublisherApiClient();
 
-            var result = await client.LoginAsync(USERNAME, PASSWORD);
+            var loginResult = await client.LoginAsync(USERNAME, PASSWORD);
 
-            if (result.Status == LoginStatus.TFA)
+            if (loginResult.Status == LoginStatus.TFA)
             {
                 Console.WriteLine($"Please, write TFA code: ");
                 var tfaCode = Console.ReadLine();
                 Console.WriteLine($"TFA Code: {tfaCode}");
-                result = await client.LoginAsync(result.TfaResumeData, tfaCode);
+                loginResult = await client.LoginAsync(loginResult.TfaResumeData, tfaCode);
             }
 
             var info = await client.GetUserInfoAsync();
@@ -36,7 +36,7 @@ namespace RSoftware.Unity.PublisherApi.Client.ConsoleTestApp
 
             var packages = await client.GetPackagesInfoAsync();
 
-            Console.WriteLine($"Result: {result}; Info: {info.Name}");
+            Console.WriteLine($"Result: {loginResult}; Info: {info.Name}");
 
             foreach (var invoice in invoices)
             {
@@ -49,6 +49,21 @@ namespace RSoftware.Unity.PublisherApi.Client.ConsoleTestApp
                 var sales = await client.GetSalesAsync(period);
                 var downloads = await client.GetDownloadsAsync(period.Value);
             }
+            
+            var accounts = await client.GetUserAccountsAsync();
+
+            foreach (var account in accounts)
+            {
+                Console.WriteLine($"Account: {account.Email}; FullName: {account.FullName}; ID: {account.Id}");
+            }
+
+            var vouchers = await client.GetVouchersAsync();
+
+            foreach (var voucher in vouchers)
+            {
+                Console.WriteLine($"Voucher: {voucher.Code}; Issued: {voucher.IssuedBy}; Package: {voucher.PackageName}");
+            }
+
         }
     }
 }
